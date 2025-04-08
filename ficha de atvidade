@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário de Atividade</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    h2 { margin-top: 40px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    input, textarea { width: 100%; padding: 6px; margin-bottom: 10px; }
+    button { padding: 8px 12px; background-color: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #1976d2; }
+  </style>
+</head>
+<body>
+  <h1>Cadastro de Atividade</h1>
+  <form id="activityForm">
+    <label>Nome da Atividade:</label>
+    <input type="text" name="atividade" required>
+
+    <label>Data:</label>
+    <input type="date" name="data" required>
+
+    <label>Responsável:</label>
+    <input type="text" name="responsavel" required>
+
+    <label>Objetivos:</label>
+    <textarea name="objetivos" rows="3"></textarea>
+
+    <h2>Orçamento</h2>
+    <table id="orcamentoTable">
+      <thead>
+        <tr><th>Item</th><th>Valor (R$)</th><th>Categoria</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" onclick="addOrcamentoLinha()">+ Adicionar Item</button>
+
+    <h2>Plano Horário</h2>
+    <table id="horarioTable">
+      <thead>
+        <tr><th>Início</th><th>Fim</th><th>Atividade</th><th>Responsável</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" onclick="addHorarioLinha()">+ Adicionar Atividade</button>
+
+    <br><br>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    function addOrcamentoLinha() {
+      const table = document.getElementById('orcamentoTable').querySelector('tbody');
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td><input type="text" name="orcamento_item[]" required></td>
+        <td><input type="number" name="orcamento_valor[]" required></td>
+        <td><input type="text" name="orcamento_categoria[]"></td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove()">🗑️</button></td>
+      `;
+    }
+
+    function addHorarioLinha() {
+      const table = document.getElementById('horarioTable').querySelector('tbody');
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td><input type="time" name="inicio[]" required></td>
+        <td><input type="time" name="fim[]" required></td>
+        <td><input type="text" name="atividade_desc[]" required></td>
+        <td><input type="text" name="atividade_responsavel[]"></td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove()">🗑️</button></td>
+      `;
+    }
+
+    document.getElementById('activityForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      fetch('https://script.google.com/macros/s/AKfycby9wT6GZhSvKwjATquG8LMYa5dOpP_tF5DeL5082h-wUiHaLM0try3aEXVkgGaNf7JRXA/exec', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Enviado com sucesso!');
+          this.reset();
+          document.querySelector('#orcamentoTable tbody').innerHTML = '';
+          document.querySelector('#horarioTable tbody').innerHTML = '';
+        } else {
+          alert('Erro ao enviar.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Erro de conexão.');
+      });
+    });
+  </script>
+</body>
+</html>
